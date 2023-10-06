@@ -19,6 +19,9 @@ import java.util.*;
 
 public class AnalisisResultadosConjuntos2021 {
 
+    public static String EURUSD_5MIN_ASK = "EURUSD_5 Mins_Ask.csv";
+    public static String EURUSD_5MIN_BID = "EURUSD_5 Mins_Bid.csv";
+    public static String ESTRATEGIAS = "estrategias.csv";
 
     public static StratPerformance getBollingueResults(
             String path0,
@@ -26,7 +29,8 @@ public class AnalisisResultadosConjuntos2021 {
             double initialBalance,
             int nbars, double dt, double sl, double risk,
             int year1, int year2,
-            int h1, int h2, int m1, int m2,
+            int m1, int m2,
+            int h1, int h2,
             String periodBidStr,
             String periodAskStr,
             String outFileName,
@@ -58,9 +62,9 @@ public class AnalisisResultadosConjuntos2021 {
         HashMap<String, ArrayList<Integer>> maxMinsHash = new HashMap<String, ArrayList<Integer>>();
         HashMap<String, HashMap<Integer, Integer>> atrHashHash = new HashMap<String, HashMap<Integer, Integer>>();
 
-        ArrayList<Tick> ticks = new ArrayList<Tick>();
         int minSize = -1;
         String pathBid = path0 + curr + periodBidStr;
+
         dataI = new ArrayList<QuoteShort>();
         dataI = DAO.retrieveDataShort5m(pathBid, DataProvider.DUKASCOPY_FOREX4);
         TestLines.calculateCalendarAdjustedSinside(dataI);
@@ -77,6 +81,8 @@ public class AnalisisResultadosConjuntos2021 {
         //System.out.println("curr= "+curr+" dataBid/Ask: "+pathBid+" "+pathAsk+" "+dataBid.size()+" "+dataAsk.size());
         if (minSize == -1 || dataBid.size() < minSize) minSize = dataBid.size();
         if (minSize == -1 || dataAsk.size() < minSize) minSize = dataAsk.size();
+
+        //System.out.println("lastValue: "+dataBid.get(minSize-1));
 
         ArrayList<Integer> maxMins = TradingUtils.calculateMaxMinByBarShortAbsoluteInt(dataBid);
         HashMap<Integer, Integer> atrHash = TradingUtils.calculateATR(dataBid, 20);
@@ -134,8 +140,8 @@ public class AnalisisResultadosConjuntos2021 {
         mm.setPrintMonthProfit(outFileName + ".month.csv", true);
 
         mm.doTest(h1 + " " + h2 + " " + nbars + " " + (int) (dt * 100) + " " + (int) (sl * 10) + " " + (int) (100 * risk),
-                currList, dataBidHash, dataAskHash, maxMinsHash, atrHashHash, minSize, calFrom, calTo, sp,
-                1, 0, printOptions);
+                currList, dataBidHash, dataAskHash, maxMinsHash, atrHashHash, minSize,
+                calFrom, calTo, sp, 1, 0, printOptions);
 
         return sp;
 
@@ -388,7 +394,7 @@ public class AnalisisResultadosConjuntos2021 {
                     dec = values[1].length();
                     valStr = str.replace(".", "");
                     valInt = Integer.valueOf(valStr);
-					
+
 					/*if (valInt!=0){
 						System.out.println("[INSIDE] "+DateUtils.datePrint(cal)
 								+" "+valInt
@@ -412,7 +418,7 @@ public class AnalisisResultadosConjuntos2021 {
             dayMonthPerformace.put(dayMonth, ap + dayChange);
             dayChangeList.add(dayChange);
             actualBalance = actualBalance * (1 + dayChange / 100.0);
-			
+
 			/*if (dayChange!=0.00)
 				System.out.println("[Change] "+DateUtils.datePrint(cal)
 						+" "+PrintUtils.Print3dec(dayChange, false)
@@ -534,7 +540,7 @@ public class AnalisisResultadosConjuntos2021 {
                     monthChange.add(per);
 					/*System.out.println(
 							"mes "
-							+PrintUtils.Print2dec(per, false)	
+							+PrintUtils.Print2dec(per, false)
 							+" "+PrintUtils.Print2dec(actualBalance, false)
 							//+" "+PrintUtils.Print2dec(per, false)
 					);*/
@@ -570,7 +576,7 @@ public class AnalisisResultadosConjuntos2021 {
             monthChange.add(per);
 			/*System.out.println(
 					"mes "
-					+PrintUtils.Print2dec(per, false)	
+					+PrintUtils.Print2dec(per, false)
 					+" "+PrintUtils.Print2dec(actualBalance, false)
 					//+" "+PrintUtils.Print2dec(per, false)
 			);*/
@@ -634,7 +640,7 @@ public class AnalisisResultadosConjuntos2021 {
 
         double avgMaxMonthDD = MathUtils.average(maxMonthDDArr);
         if (isAlways || diff3m >= 0)//s�lo si los 3 ultimos meses son positivos
-            System.out.println(PrintUtils.leftpad(header, 50)
+            System.out.println(PrintUtils.leftpad(header, 20)
                     + " " + DateUtils.datePrintDDMMYYYYNoSep(calStart)
                     + " " + DateUtils.datePrintDDMMYYYYNoSep(calEnd)
                     + " || "
@@ -659,12 +665,12 @@ public class AnalisisResultadosConjuntos2021 {
                     + " " + PrintUtils.Print2dec(dtm, false)
                     + " || maxMontDD10= " + PrintUtils.Print2dec(maxlossm95 * 100.0 / totalm, false)
                     + " || maxMontDD65= " + PrintUtils.Print2dec(maxlossm95_2 * 100.0 / totalm, false)
-                    + " || monthVar [" + PrintUtils.Print2dec(var95, false) + "] " + PrintUtils.Print2dec(lossm95 * 100.0 / totalm, false)
-                    + " || monthVar [" + PrintUtils.Print2dec(var95_2, false) + "] " + PrintUtils.Print2dec(lossm95_2 * 100.0 / totalm, false)
+                    //+ " || monthVar [" + PrintUtils.Print2dec(var95, false) + "] " + PrintUtils.Print2dec(lossm95 * 100.0 / totalm, false)
+                    //+ " || monthVar [" + PrintUtils.Print2dec(var95_2, false) + "] " + PrintUtils.Print2dec(lossm95_2 * 100.0 / totalm, false)
             );
 
         //dayMonthPerformance
-		
+
 		/*List<Integer> keysMP = new ArrayList<>(dayMonthPerformace.keySet());
 		Collections.sort(keysMP);
 		for (int i=0;i<keysMP.size();i++){
@@ -689,88 +695,10 @@ public class AnalisisResultadosConjuntos2021 {
                                              StratPerformance sp,
                                              int excludeFomcDays
     ) throws IOException {
-        if (!headStr.equalsIgnoreCase(""))
-            System.out.println(headStr);
+        //if (!headStr.equalsIgnoreCase(""))
+            //System.out.println(headStr);
         //String path = "c:\\fxdata\\";
 
-        //String eurusd_2_3="eurusd_50_25_4_2_2_3.csv";
-        //String eurusd_5="eurusd_50_10_5_1_5_5.csv";
-        //String eurusd_6="eurusd_55_14_9_3_6_6.csv";
-        //String eurusd_7_8="eurusd_65_20_8_3_7_8.csv";
-        String eurusd_23_1_axi = "eurusd_42_10_7_1_23_25.csv";
-        String eurusd_23_26 = "eurusd_96_10_8_1_23_26.csv";
-        String eurusd_23_1 = "eurusd_42_10_7_2_23_25.csv";
-        String eurusd_2_2 = "eurusd_24_6_7_3_2_2.csv";//eurusd_24_15_6_4_2_2.csv";
-        String eurusd_5_8 = "eurusd_36_15_8_1_5_8.csv";
-        String eurusd_5_8_darwinex = "eurusd_36_15_8_1_5_8.csv";
-        String eurusd_5_5 = "eurusd_36_10_6_2_5_5.csv";
-        String eurusd_6_8 = "eurusd_36_10_9_2_6_8.csv";
-        String eurusd_9_9 = "eurusd_10_6_7_4_9_9.csv";
-        String eurusd_14_14 = "eurusd_15_10_6_2_14_14.csv";
-        String eurusd_18_18 = "eurusd_6_11_10_4_18_18.csv";
-        String eurusd_22_22 = "eurusd_84_15_9_2_22_22.csv";
-
-        //de 11 a 22
-        String eurusd_11_11 = "eurusd_24_15_2_1_11_11.csv";
-        String eurusd_17_17 = "eurusd_96_35_4_1_17_17.csv";
-        String eurusd_23_1_1min = "eurusd_180_10_5_1_23_25_1min.csv";
-        //String eurusd_23_1_1min="eurusd_105_20_5_1_23_25_1min.csv";
-        String eurusd_5_8_1min = "eurusd_280_20_5_1_5_8_1min.csv";
-        String eurusd_9_9_1min = "eurusd_42_10_2_1_9_9_1min.csv";
-        String eurusd_2_2_1min = "eurusd_24_10_6_4_2_2.csv";//eurusd_55_20_5_2_2_2_1min.csv";
-        String eurusd_18_18_1min = "eurusd_30_20_5_1_18_18_1min.csv";
-
-
-        String audusd_23_1 = "audusd_24_10_4_1_23_25.csv";
-        String usdjpy_23_1 = "usdjpy_24_10_2_1_23_25.csv";
-        String gbpjpy_23_1 = "gbpjpy_30_30_10_2_23_25.csv";
-
-        String eurcad_23_1 = "eurcad_35_15_6_2_23_25.csv";
-        String euraud_23_1 = "euraud_30_15_4_1_23_25.csv";
-        String eurgbp_23_1 = "eurgbp_35_15_6_2_23_25.csv";
-        String gbpusd_23_1 = "gbpusd_35_15_6_2_23_25.csv";
-
-        String usdjpy_23_23 = "usdjpy_36_10_10_2_23_23.csv";
-        String usdjpy_0_0 = "usdjpy_36_10_10_1_0_0.csv";
-        String usdjpy_1_1 = "usdjpy_36_10_10_2_1_1.csv";
-        String usdjpy_2_2 = "usdjpy_60_15_6_2_2_2.csv";
-
-        String eurjpy_23_1 = "eurjpy_36_10_7_2_23_25.csv";
-        String eurjpy_2_2 = "eurjpy_48_10_8_1_2_2.csv";
-        String usdjpy_12_12 = "usdjpy_36_20_9_3_12_12.csv";
-        String usdjpy_14_14 = "usdjpy_12_15_9_5_14_14.csv";
-        String usdjpy_21_21 = "usdjpy_39_10_9_2_21_21.csv";
-        String usdjpy_22_22 = "usdjpy_42_10_10_2_21_21.csv";
-
-        //estrategia buuffer
-        String euBuffer = "tbglobal_400_10_70_3.csv";
-        String euBuffer_darwinex = "tb_global_prod_20200805_darwinex.csv";
-        String euBuffer_axi = "tb_global_prod_20201106_axiRisk.csv";
-        String eurusd_23_1_15min = "eurusd_13_10_6_3_23_25_15min.csv";
-        String eurusd_5_8_15min = "eurusd_15_10_6_3_5_8_15min.csv";
-        String eurusd_18_18_15min = "eurusd_3_10_9_10_18_18_15min.csv";
-        String eurusd_0_1_15min = "eurusd_15_10_8_6_0_1_15min.csv";
-        String eurusd_0_1_darwinex_15min = "eurusd_15_10_8_5_0_1_15min.csv";
-        String eurusd_0_15min = "eurusd_15_10_8_6_0_0_15min.csv";
-        String eurusd_1_15min = "eurusd_15_10_7_6_1_1_15min.csv";
-
-        String eurusd_6_15min = "eurusd_18_10_9_6_6_6_15min.csv";
-        String eurusd_7_15min = "eurusd_17_10_9_7_7_7_15min.csv";
-        String eurusd_8_15min = "eurusd_22_10_10_5_8_8_15min.csv";
-
-        String eurusd_19_15min = "eurusd_4_10_7_5_19_19_15min.csv";
-
-        String eurusd_22_15min = "eurusd_14_10_8_4_22_22_15min.csv";
-        String eurusd_23_15min = "eurusd_16_15_9_6_23_23_15min.csv";
-
-        //15 min darwinex
-        String eurusd_23_25_15min = "eurusd_14_10_6_4_23_25_15min.csv";
-        String eurusd_2_15min = "eurusd_18_10_7_5_2_2_15min.csv";
-        String eurusd_6_8_15min = "eurusd_18_11_10_4_6_8_15min.csv";
-        String eurusd_18_15min = "eurusd_3_10_10_7_18_18_15min.csv";
-        String eurusd_21_15min = "eurusd_13_15_10_6_21_21_15min.csv";
-
-        String usdjpy_23_25_15min = "usdjpy_14_10_6_4_23_25_15min.csv";
 
         //COMPROBAMOS EL RESULTADO AGREGADO
 
@@ -830,24 +758,21 @@ public class AnalisisResultadosConjuntos2021 {
             cali.set(Calendar.MILLISECOND, 0);
             excludedDaysHash.put(cali.getTimeInMillis(), true);
         }
-        System.out.println(excludedDaysHash.size());
+        //System.out.println(excludedDaysHash.size());
     }
 
 
-    private static void doRecalculateStrats(
+    public static void doRecalculateStrats(
             double balance,
+            int year1,
+            int year2,
             String folder, String fileName,
-            String filePeriod,
             ArrayList<String> darwinexFiles,
             ArrayList<String> axiFiles,
             ArrayList<String> axiFiles2,
             ArrayList<String> darwinex1Files,
             boolean isRecalculate
     ) throws IOException {
-
-        ;
-        int year1 = 2011;
-        int year2 = 2021;
         double initialBalance = balance;
 
         HashMap<String, Boolean> stratsTested = new HashMap<String, Boolean>();
@@ -881,15 +806,15 @@ public class AnalisisResultadosConjuntos2021 {
                     int h2 = Integer.valueOf(params[8]);
                     int is5m = 1;
                     if (timeframe.equalsIgnoreCase("5MIN")) {
-                        askFile = "_5 Mins_Ask_" + filePeriod;//2011.01.01_2020.11.30.csv";
-                        bidFile = "_5 Mins_Bid_" + filePeriod;//2011.01.01_2020.11.30.csv";
+                        askFile = "_5 Mins_Ask.csv";
+                        bidFile = "_5 Mins_Bid.csv";
                     } else if (timeframe.equalsIgnoreCase("15MIN")) {
-                        askFile = "_15 Mins_Ask_" + filePeriod;//2011.01.01_2020.11.30.csv";
-                        bidFile = "_15 Mins_Bid_" + filePeriod;//2011.01.01_2020.11.30.csv";
+                        askFile = "_15 Mins_Ask.csv";
+                        bidFile = "_15 Mins_Bid.csv";
                         is5m = 0;
                     } else if (timeframe.equalsIgnoreCase("1MIN")) {
-                        askFile = "_1 Min_Ask_" + filePeriod;//2011.01.01_2020.11.30.csv";
-                        bidFile = "_1 Min_Bid_" + filePeriod;//2011.01.01_2020.11.30.csv";
+                        askFile = "_1 Min_Ask.csv";
+                        bidFile = "_1 Min_Bid.csv";
                         is5m = 0;
                     }
 
@@ -951,12 +876,14 @@ public class AnalisisResultadosConjuntos2021 {
      */
     public static void main(String[] args) throws IOException {
 
-        String filePeriod = "2011.11.01_2021.11.27.csv";
-        String path = "f:\\fxdata\\";
-        Path pathP = Paths.get(path);
-        if (!Files.exists(pathP)) {
-            path = "c:\\fxdata\\";
-        }
+        String path = "data\\";
+        String stratsFile = path + "strategies\\" + AnalisisResultadosConjuntos2021.ESTRATEGIAS;
+        String eurBidFile = path + AnalisisResultadosConjuntos2021.EURUSD_5MIN_BID;
+        int rec_year1 = 2012;
+        int rec_year2 = 2023;
+
+        AnalisisResultadosConjuntos2021 ana = new AnalisisResultadosConjuntos2021();
+
 
         double balanceI = 2500;
         ArrayList<String> darwinex1Files = new ArrayList<String>();
@@ -964,15 +891,14 @@ public class AnalisisResultadosConjuntos2021 {
         ArrayList<String> axiFiles = new ArrayList<String>();
         ArrayList<String> axiFiles2 = new ArrayList<String>();
         HashMap<Long, Boolean> excludedDays = new HashMap<Long, Boolean>();
-        String stratsFile = path + "estrategias_20211126.csv";
-        boolean recalculate = false;
+        boolean recalculate = Boolean.FALSE;
 
         //LEEMOS LAS ESTRATEGIAS y calculamos
-        doRecalculateStrats(balanceI, path, stratsFile, filePeriod, darwinexFiles, axiFiles, axiFiles2, darwinex1Files, recalculate);
+        doRecalculateStrats(balanceI, rec_year1, rec_year2, path, stratsFile, darwinexFiles, axiFiles, axiFiles2, darwinex1Files, recalculate);
         System.out.println("axiFiles2 , axifiles, darwinexfiles,darwinex1,: " + axiFiles2.size() + " " + axiFiles.size() + " " + darwinexFiles.size() + " " + darwinex1Files.size());
 
         ArrayList<String> files = new ArrayList<String>();
-        String dataBidPath = path + "eurusd_5 Mins_Bid_" + filePeriod;
+        String dataBidPath = eurBidFile;
 
         ArrayList<QuoteShort> dataI = null;
         ArrayList<QuoteShort> dataS = null;
@@ -982,8 +908,6 @@ public class AnalisisResultadosConjuntos2021 {
         dataS = TradingUtils.cleanWeekendDataS(dataI);
         ArrayList<QuoteShort> dataBid = dataS;
         HashMap<Integer, Integer> atrHash = TradingUtils.calculateATR(dataBid, 20);
-        //System.out.println(atrHash.size());
-
 
         int isEndInt = 0;
         StratPerformance sp = new StratPerformance();
@@ -1000,10 +924,10 @@ public class AnalisisResultadosConjuntos2021 {
                 sp.reset();
                 sp.setInitialBalance(balance);
                 for (int minATR = 0; minATR <= 0; minATR += 1) {
-                    //isEndInt = doTestProductionSystem("",path,darwinex1Files,balance,atrHash,offset,-1,true,false,minATR,sp);
-                    //isEndInt = doTestProductionSystem("",path,darwinexFiles,balance,atrHash,offset,-1,true,false,minATR,sp);
+                    //isEndInt = doTestProductionSystem("DMO",path,darwinex1Files,balance,atrHash,offset,12,true,false,minATR,sp,0);
+                    isEndInt = doTestProductionSystem("DQO", path, darwinexFiles, balance, atrHash, offset, 3, true, false, minATR, sp, 0);
                     //isEndInt = doTestProductionSystem("",path,axiFiles,balance,atrHash,offset,-1,true,false,minATR,sp);
-                    isEndInt = doTestProductionSystem("", path, axiFiles2, balance, atrHash, offset, 3, true, false, minATR, sp, 0);//exludesdAys
+                    //isEndInt = doTestProductionSystem("",path,axiFiles2,balance,atrHash,offset,3,true,false,minATR,sp,0);//exludesdAys
                     //isEndInt = doTestProductionSystem("",path,axiFiles2,balance,atrHash,offset,120,true,false,minATR,sp,1);//exludesdAys
                     //isEndInt = doTestProductionSystem("",path,axiFiles2,balance,atrHash,offset,120,true,false,minATR,sp,2);//exludesdAys
                     totalTrials++;
@@ -1034,21 +958,7 @@ public class AnalisisResultadosConjuntos2021 {
 
         boolean isAgregado = true;
         ArrayList<String> currList = new ArrayList<String>();
-        currList.add("eurusd");
-        //currList.add("usdjpy");
-        ////currList.add("audusd");
-        //currList.add("eurjpy");
-        //currList.add("audnzd");
-        //currList.add("gbpusd");
-		
-		/*currList.add("usdcad");
-		currList.add("nzdusd");
-		currList.add("gbpusd");
-		currList.add("eurgbp");
-		currList.add("eurcad");
-		currList.add("euraud");
-		currList.add("audcad");
-		currList.add("audnzd");*/
+        currList.add("eurjpy");
 
         if (currList.size() == 1) {
             //System.out.println("Curr: "+currList.get(0));
@@ -1059,21 +969,17 @@ public class AnalisisResultadosConjuntos2021 {
         }
 
         //DARWINEX FILES
-
+        //TODO, MEDIR EL DD medio como medida fundamental
         double initialBalance = 2500;
-        int year1 = 2011;
-        int year2 = 2021;
-        int h1 = 23;
-        int h2 = 25;
+        int year1 = 2012;
+        int year2 = 2023;
+        int h1 = 5;
+        int h2 = 6;
 
-
-        //5 5 87 10 7 10 || sharpem=01.19 || %Profit=10.33 || MaxDD=01.85 || avgWinLos=0.42 || avgTimePeak=18.58 maxTimePeak=357.00 || timeFromPeak=0.00 ||  4261 76.60 1.36 1.42
-        //6 6 84 10 7 10 || sharpem=00.64 || %Profit=06.00 || MaxDD=02.38 || avgWinLos=0.38 || avgTimePeak=33.25 maxTimePeak=630.00 || timeFromPeak=4.00 ||  3772 76.33 1.23 1.24
-        //7 7 69 10 7 10 || sharpem=00.91 || %Profit=06.55 || MaxDD=02.04 || avgWinLos=0.40 || avgTimePeak=29.98 maxTimePeak=583.00 || timeFromPeak=2.00 ||  2898 77.43 1.36 1.38
-        //8 8 33 10 7 10 || sharpem=01.08 || %Profit=05.59 || MaxDD=02.01 || avgWinLos=0.53 || avgTimePeak=26.74 maxTimePeak=542.00 || timeFromPeak=3.00 ||  2033 74.27 1.53 1.53
-        int printOptions = 0;
-        String periodBidStr = "_1 Min_Bid_" + filePeriod;
-        String periodAskStr = "_1 Min_Ask_" + filePeriod;
+        String filePeriod = "";
+        int printOptions = 1;
+        String periodBidStr = "_5 Mins_Bid.csv";
+        String periodAskStr = "_5 Mins_Ask.csv";
         String tailStr = "";
         String header = "";
 
@@ -1085,20 +991,22 @@ public class AnalisisResultadosConjuntos2021 {
             subTail = "_15min.csv";
         }
 
-        //System.out.println("**** PERIOD "+year1+" "+year2);
+        System.out.println("**** PERIOD " + year1 + " " + year2);
         for (int h3 = -1; h3 <= -1; h3++) {
             if (h3 >= 0) {
                 h1 = h3;
                 h2 = h3;
             }
-            for (int nbars = 80; nbars <= 250; nbars += 5) {
-                for (int dtInt = 15; dtInt <= 15; dtInt += 5) {
-                    for (int slInt = 10; slInt <= 10; slInt += 4) {
+            for (int nbars = 12; nbars <= 120; nbars += 6) {
+                for (int dtInt = 10; dtInt <= 30; dtInt += 5) {
+                    for (int slInt = 10; slInt <= 10; slInt += 5) {
                         for (double risk = 0.1; risk <= 0.1; risk += 0.10) {
 
                             SimpleStats ss = new SimpleStats(nbars, dtInt, slInt);
-                            int monthStep = 4;
-                            for (int year = year1; year <= year2; year++) {
+                            int monthStep = 12;
+                            for (int year = year1; year <= year1; year++) {
+                                int yearFrom = year1;
+                                int yearTo = year2;
                                 for (int month = Calendar.JANUARY; month <= Calendar.DECEMBER - (monthStep - 1); month += monthStep) {
                                     for (int minAtr = 0; minAtr <= 0; minAtr += 500) {
                                         double dt = dtInt * 0.01;
@@ -1124,17 +1032,20 @@ public class AnalisisResultadosConjuntos2021 {
                                             header = outFileName;
                                             //System.out.println("antes de bollinger");
                                             StratPerformance spIndividual = AnalisisResultadosConjuntos2021.getBollingueResults(path, curr,
-                                                    initialBalance, nbars, dt, sl, risk, year, year, month, month + (monthStep - 1), h1, h2,
+                                                    initialBalance, nbars, dt, sl, risk, yearFrom, yearTo, month, month + (monthStep - 1), h1, h2,
                                                     periodBidStr, periodAskStr, outFileName, minAtr, printOptions);
 
-                                            if (spIndividual.getTrades() > 0)
-                                                ss.addStats(spIndividual.getSharpeRatio(), spIndividual.getTrades());
+                                            if (spIndividual.getTrades() > 0) {
+                                                double sharpeRatio = spIndividual.getSharpeRatio() >= 2.5 ? 2.5 : spIndividual.getSharpeRatio();
+                                                //System.out.println(year+" "+spIndividual.getTrades()+ " "+PrintUtils.Print2dec(sharpeRatio, false)+" "+sp.getPf());
+                                                ss.addStats(sharpeRatio, spIndividual.getTrades());
+                                            }
                                         }
                                     }//minAtr
                                 }//month
                             }//years
-                            if ((ss.getPositivePercent() >= 0))
-                                System.out.println(currList.get(0) + " " + year1 + " " + year2 + " " + h1 + " " + h2 + " || " + ss.toString());
+                            //if ((ss.getPositivePercent()>=0))
+                            //System.out.println(currList.get(0) + " "+year1+" "+year2+" "+h1+" "+h2+" || "+ss.toString());
                         }
                     }
                 }

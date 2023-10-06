@@ -17,12 +17,12 @@ public class TradingUtils {
         ArrayList<QuoteShort> data = new ArrayList<QuoteShort>();
 
         Calendar cal = Calendar.getInstance();
-        for (int i=0;i<dataS.size();i++){
+        for (int i = 0; i < dataS.size(); i++) {
             QuoteShort q = dataS.get(i);
             QuoteShort.getCalendar(cal, q);
             int day = cal.get(Calendar.DAY_OF_YEAR);
-            if (cal.get(Calendar.DAY_OF_WEEK)==Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY
-                    || day==1)
+            if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY
+                    || day == 1)
                 continue;
             QuoteShort qNew = new QuoteShort();
             qNew.copy(q);
@@ -108,79 +108,79 @@ public class TradingUtils {
         // TODO Auto-generated method stub
 
         long actualSize = 0;
-        for (int i=0;i<positions.size();i++) {
+        for (int i = 0; i < positions.size(); i++) {
             PositionCore p = positions.get(i);
 
-            if (p.getPositionStatus()==PositionStatus.OPEN) {
+            if (p.getPositionStatus() == PositionStatus.OPEN) {
                 actualSize += p.getMicroLots();
             }
         }
         return actualSize;
     }
 
-    public static String completeNumber5(String num){
-        String com=num;
+    public static String completeNumber5(String num) {
+        String com = num;
 
-        if (com.length()==5)
-            com+="0";
-        if (com.length()==4)
-            com+="00";
-        if (com.length()==3)
-            com+="000";
-        if (com.length()==2)
-            com+="0000";
-        if (com.length()==1)
-            com+="00000";
+        if (com.length() == 5)
+            com += "0";
+        if (com.length() == 4)
+            com += "00";
+        if (com.length() == 3)
+            com += "000";
+        if (com.length() == 2)
+            com += "0000";
+        if (com.length() == 1)
+            com += "00000";
         return com;
     }
 
-    public static String completeNumber(String num){
-        String com=num;
+    public static String completeNumber(String num) {
+        String com = num;
 
-        if (com.length()==4)
-            com+="0";
-        if (com.length()==3)
-            com+="00";
-        if (com.length()==2)
-            com+="000";
-        if (com.length()==1)
-            com+="0000";
+        if (com.length() == 4)
+            com += "0";
+        if (com.length() == 3)
+            com += "00";
+        if (com.length() == 2)
+            com += "000";
+        if (com.length() == 1)
+            com += "0000";
         return com;
     }
 
-    public static int getPipsDiff(double val1,double val2){
+    public static int getPipsDiff(double val1, double val2) {
         String val1Str = PrintUtils.Print3(val1);
         String val2Str = PrintUtils.Print3(val2);
-        val1Str = completeNumber(val1Str.substring(0, 1)+val1Str.substring(2, val1Str.length()));
-        val2Str = completeNumber(val2Str.substring(0, 1)+val2Str.substring(2, val2Str.length()));
+        val1Str = completeNumber(val1Str.substring(0, 1) + val1Str.substring(2));
+        val2Str = completeNumber(val2Str.substring(0, 1) + val2Str.substring(2));
 
         //System.out.println("[getPipsDiff] "+val1+" "+val2+" "+val1Str+" "+val2Str);
-        int diff =Integer.valueOf(val1Str)-Integer.valueOf(val2Str);
+        int diff = Integer.valueOf(val1Str) - Integer.valueOf(val2Str);
         return diff;
     }
 
-    public static int getDayIndexShort(ArrayList<QuoteShort> dataSource, Calendar actualCal, int index){
+    public static int getDayIndexShort(ArrayList<QuoteShort> dataSource, Calendar actualCal, int index) {
         int daySearch = actualCal.get(Calendar.DAY_OF_MONTH);
         Calendar sourceCal = Calendar.getInstance();
-        for (int i=index;i<dataSource.size();i++){
+        for (int i = index; i < dataSource.size(); i++) {
             QuoteShort q = dataSource.get(i);
             q.getCalendar(sourceCal, q);
             int daySource = sourceCal.get(Calendar.DAY_OF_MONTH);
-            if (DateUtils.isSameDay(sourceCal, actualCal)){
+            if (DateUtils.isSameDay(sourceCal, actualCal)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public static int getPipsDiff5(double val1,double val2){
+    public static int getPipsDiff5(double val1, double val2) {
         String val1Str = PrintUtils.Print5dec(val1);
         String val2Str = PrintUtils.Print5dec(val2);
-        val1Str = completeNumber5(val1Str.substring(0, 1)+val1Str.substring(2, val1Str.length()));
-        val2Str = completeNumber5(val2Str.substring(0, 1)+val2Str.substring(2, val2Str.length()));
+        val1Str = completeNumber5(val1Str.charAt(0) + val1Str.substring(2));
+        val2Str = completeNumber5(val2Str.charAt(0) + val2Str.substring(2));
 
 
-        int diff =Integer.valueOf(val1Str)-Integer.valueOf(val2Str);
+        int diff = Integer.valueOf(val1Str) - Integer.valueOf(val2Str);
         return diff;
     }
 

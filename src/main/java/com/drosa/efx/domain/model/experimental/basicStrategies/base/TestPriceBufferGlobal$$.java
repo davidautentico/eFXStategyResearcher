@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
+
 public class TestPriceBufferGlobal$$ {
 
     public static double doTest(
@@ -1193,6 +1194,7 @@ public class TestPriceBufferGlobal$$ {
             double maxDiff,
             int sma,
             double thrSma,
+            int minAcceptableDiffFromPeak,
             boolean debug,
             int printSummary,
             int returnMode,
@@ -1348,6 +1350,8 @@ public class TestPriceBufferGlobal$$ {
         //double thrSma = 0.5;
         ArrayList<Integer> openArr = new ArrayList<Integer>();
         int lastPrice = -1;
+        String isPeak = "";
+        double maxEquitity = balance;
         for (int i = 100; i < minSizeData - 2; i++) {
             QuoteShort qb1 = dataBid.get(i - 1);
             QuoteShort qb = dataBid.get(i);
@@ -1422,20 +1426,26 @@ public class TestPriceBufferGlobal$$ {
                     if (printDayProfit) {
                         double totalamountrisked = 0.0;//totalPipsRisk*0.1*totalMicrolots*0.1;
                         double totalRiskPer = 0.0;//amountRisked*100.0/sp.getActualBalance();
-
+                        if (actualEquitity > maxEquitity) {
+                            maxEquitity = actualEquitity;
+                            isPeak = "PEAK";
+                        }
                         String strdp = DateUtils.datePrint(cal1)
                                 + ";" + PrintUtils.Print3dec(perProfit, false)
                                 + ";" + totalOpenPositions
                                 + ";" + totalMicrolots
                                 + ";" + PrintUtils.Print2dec(totalRiskPer, false)
-                                + ";" + PrintUtils.Print2dec(sp.getActualEquitity(), false)
                                 + ";" + PrintUtils.Print2dec(sp.getActualBalance(), false)
+                                + ";" + PrintUtils.Print2dec(actualEquitity, false)
+                                + ";" + PrintUtils.Print2dec(maxEquitity, false)
+                                + ";" + isPeak
                                 //+";"+PrintUtils.Print2dec(dayBalance, false)
                                 ;
                         if (myWriter != null)
                             myWriter.write(strdp + '\n');
                     }
                 }
+                isPeak = "";
                 lastH = actualCheck;
                 hourBalance = actualEquitity;
             }
@@ -2068,7 +2078,7 @@ public class TestPriceBufferGlobal$$ {
         double avgm = MathUtils.average(monthChanges);
         double dtm = Math.sqrt(MathUtils.variance(monthChanges));
         double sharpe = (avgm / dtm) * Math.sqrt(12.0);
-        sharpe = (dAvg / dDT) * Math.sqrt(252);
+        //sharpe = (dAvg/dDT)*Math.sqrt(252);
         double diff3m = finalBalance3m * 100.0 / initialBalance3m - 100.0;
         double diff6m = finalBalance6m * 100.0 / initialBalance6m - 100.0;
         double diff9m = finalBalance9m * 100.0 / initialBalance9m - 100.0;
@@ -2080,9 +2090,10 @@ public class TestPriceBufferGlobal$$ {
             sp.getDayReturns();
         }
 
+        if (sp.getTrades() > 0) sp.setSharpeRatio(sharpe);
         if (printSummary == 1) {
             if (maxDD < 3000.0
-                    //&& perMaxWin>=500.0
+                    && diffFromPeak <= minAcceptableDiffFromPeak
                     && sp.getTrades() > 0
             )
                 System.out.println(
@@ -2136,14 +2147,16 @@ public class TestPriceBufferGlobal$$ {
 
     public static void main(String[] args) throws Exception {
 
-        String path0 = "f:\\fxdata\\";
+        //Path resourceDirectory = Paths.get("data");
+        //String path0 = resourceDirectory.toFile().getAbsolutePath() + "\\";
+        String path0 = "data\\";
         Path pathP = Paths.get(path0);
         if (!Files.exists(pathP)) {
             path0 = "c:\\fxdata\\";
         }
         String currency = "eurusd";
-        String pathBid = path0 + currency + "_5 Mins_Bid_2011.01.01_2021.11.26.csv";
-        String pathAsk = path0 + currency + "_5 Mins_Ask_2011.01.01_2021.11.26.csv";
+        String pathBid = path0 + currency + "_5 Mins_Bid.csv";
+        String pathAsk = path0 + currency + "_5 Mins_Ask.csv";
         String pathSpread = path0 + currency + "_spreads_2009_2019.csv";
 
         System.out.println(currency);
@@ -2160,6 +2173,7 @@ public class TestPriceBufferGlobal$$ {
         ArrayList<Double> factors16 = new ArrayList<Double>();
         ArrayList<Double> month10s = new ArrayList<Double>();
         ArrayList<Double> month10_2016s = new ArrayList<Double>();
+        ArrayList<Integer> totalTradesArr = new ArrayList<Integer>();
         ArrayList<Integer> tradess = new ArrayList<Integer>();
         ArrayList<Integer> trades_2016s = new ArrayList<Integer>();
         ArrayList<Integer> maxTradesArr = new ArrayList<Integer>();
@@ -2176,7 +2190,7 @@ public class TestPriceBufferGlobal$$ {
         Calendar calTo = Calendar.getInstance();
         Calendar calMax = Calendar.getInstance();
         //maxima fecha es febrero
-        calMax.set(2021, Calendar.NOVEMBER, 30);
+        calMax.set(2023, Calendar.SEPTEMBER, 30);
         for (int i = 0; i <= 0; i++) {
             ArrayList<QuoteShort> dataBid = null;
             ArrayList<QuoteShort> dataAsk = null;
@@ -2224,38 +2238,51 @@ public class TestPriceBufferGlobal$$ {
 				*/
                 //configuracion axi + mnuevo
 
+				/*StrategyConfig config = new StrategyConfig();config.setParams(0,0,120,42,80,139,6,2, true);configs.add(config);//12
+				StrategyConfig config1 = new StrategyConfig();config1.setParams(1,1,192,9,55,155,9,2, true);configs.add(config1);//12
+				StrategyConfig config2 = new StrategyConfig();config2.setParams(2,2,214,15,70,132,6,3, true);configs.add(config2);//6
+				StrategyConfig config3 = new StrategyConfig();config3.setParams(3,3,176,30,70,90,1,4, true);configs.add(config3);
+				StrategyConfig config4 = new StrategyConfig();config4.setParams(4,4,1200,9,55,77,1,5, true);configs.add(config4);
+				StrategyConfig config5 = new StrategyConfig();config5.setParams(5,5,480,28,35,81,3,1, true);configs.add(config5);
+				StrategyConfig config6 = new StrategyConfig();config6.setParams(6,6,468,92,90,60,5,4, true);configs.add(config6);
+				StrategyConfig config7 = new StrategyConfig();config7.setParams(7,7,210,18,85,44,2,2, true);configs.add(config7);
+				StrategyConfig config8 = new StrategyConfig();config8.setParams(8,8,500,35,55,15,1,1, false);configs.add(config8);
+			    StrategyConfig config9 = new StrategyConfig();config9.setParams(9,9,500,32,35,19,1,1, true);configs.add(config9);
+				StrategyConfig config23 = new StrategyConfig();config23.setParams(23,23,154,7,70,139,6,1, true);configs.add(config23);*/
+
+                //NUEVAS CONFIGS PARA 2021
                 StrategyConfig config = new StrategyConfig();
-                config.setParams(0, 0, 120, 42, 80, 139, 6, 2, true);
+                config.setParams(0, 0, 192, 50, 60, 144, 4, 2, true);//r
                 configs.add(config);//12
                 StrategyConfig config1 = new StrategyConfig();
-                config1.setParams(1, 1, 192, 9, 55, 155, 9, 2, true);
+                config1.setParams(1, 1, 156, 65, 85, 180, 10, 2, true);//r
                 configs.add(config1);//12
                 StrategyConfig config2 = new StrategyConfig();
-                config2.setParams(2, 2, 214, 15, 70, 132, 6, 3, true);
+                config2.setParams(2, 2, 312, 10, 90, 132, 6, 7, true);//r
                 configs.add(config2);//6
                 StrategyConfig config3 = new StrategyConfig();
-                config3.setParams(3, 3, 176, 30, 70, 90, 1, 4, true);
+                config3.setParams(3, 3, 168, 20, 60, 90, 2, 4, true);//r
                 configs.add(config3);
                 StrategyConfig config4 = new StrategyConfig();
-                config4.setParams(4, 4, 1200, 9, 55, 77, 1, 5, true);
+                config4.setParams(4, 4, 444, 16, 60, 78, 12, 3, true);//r
                 configs.add(config4);
                 StrategyConfig config5 = new StrategyConfig();
-                config5.setParams(5, 5, 480, 28, 35, 81, 3, 1, true);
+                config5.setParams(5, 5, 576, 11, 75, 54, 6, 2, true);//r
                 configs.add(config5);
                 StrategyConfig config6 = new StrategyConfig();
-                config6.setParams(6, 6, 468, 92, 90, 60, 5, 4, true);
+                config6.setParams(6, 6, 540, 30, 40, 60, 6, 4, true);//r
                 configs.add(config6);
                 StrategyConfig config7 = new StrategyConfig();
-                config7.setParams(7, 7, 210, 18, 85, 44, 2, 2, true);
+                config7.setParams(7, 7, 264, 6, 35, 42, 19, 3, true);//r
                 configs.add(config7);
                 StrategyConfig config8 = new StrategyConfig();
-                config8.setParams(8, 8, 500, 35, 55, 15, 1, 1, false);
+                config8.setParams(8, 8, 156, 9, 30, 132, 1, 1, true);//r
                 configs.add(config8);
                 StrategyConfig config9 = new StrategyConfig();
-                config9.setParams(9, 9, 500, 32, 35, 19, 1, 1, true);
+                config9.setParams(9, 9, 600, 20, 40, 18, 2, 1, false);//r no investible
                 configs.add(config9);
                 StrategyConfig config23 = new StrategyConfig();
-                config23.setParams(23, 23, 154, 7, 70, 139, 6, 1, true);
+                config23.setParams(23, 23, 162, 7, 55, 72, 4, 4, true);
                 configs.add(config23);
 
                 HashMap<Integer, Integer> dayTotalPips = new HashMap<Integer, Integer>();
@@ -2265,22 +2292,22 @@ public class TestPriceBufferGlobal$$ {
 
 
                 ArrayList<StratPerformance> rankingList = new ArrayList<StratPerformance>();
-                int printSummary = 0;
+                int printSummary = 1;
                 int timeframe = 0;//1=dia 0 = mes
                 int periodMult = 12000000;
                 int periodLen = 12000000;
-                int yearStart = 2011;
-                int yearEnd = 2021;
+                int yearStart = 2012;
+                int yearEnd = 2023;
+                int minAcceptableDiffFromPeak = 7000;
                 printSummary = 1;
-                //printSummary = 1;
                 boolean printdayprofit = true;
                 boolean printModeRanking = false;
-                boolean isTrialsMode = true;
-                if (yearEnd != 2021) {
+                boolean isTrialsMode = false;
+                if (yearEnd != 2023) {
                     calMax.set(yearEnd, 11, 31);
                 }
                 System.out.println("** TESTPRICEBUFFER YEAR START: " + yearStart + " " + yearEnd + " || n�strats= " + configs.size());
-                for (int h = 0; h <= 0; h++) {//-1 para testear todas
+                for (int h = -1; h <= -1; h++) {//-1 para testear todas
                     if (h >= 0) {
                         int ht = h;
                         if (ht == 10) ht = 23;
@@ -2299,14 +2326,14 @@ public class TestPriceBufferGlobal$$ {
                     int totalPosiTiveTrials = 0;
                     srH.clear();
                     for (int min = -1; min <= -1; min += 5)
-                        for (int thr = 108; thr <= 108; thr += 12) {
-                            for (int tp = 25; tp <= 25; tp += 5) {
-                                for (int sl = 65; sl <= 65; sl += 5) {
+                        for (int thr = 162; thr <= 162; thr += 6) {
+                            for (int tp = 7; tp <= 7; tp += 1) {
+                                for (int sl = 55; sl <= 55; sl += 5) {
                                     for (double risk = 0.1; risk <= 0.1; risk += 0.1) {
-                                        for (int maxBars = 84; maxBars <= 84; maxBars += 12) {//35
+                                        for (int maxBars = 72; maxBars <= 72; maxBars += 6) {//35
                                             //totalTrials++;
                                             //System.out.println("*****test..."+totalTrials);
-                                            for (int barsBack = 1; barsBack <= 1; barsBack++) {
+                                            for (int barsBack = 4; barsBack <= 4; barsBack++) {
                                                 for (int maxH = 0; maxH <= 0; maxH += 1) {
                                                     for (int lostPips = 8000; lostPips <= 8000; lostPips += 50) {
                                                         if (configs.get(h) != null) {
@@ -2317,7 +2344,7 @@ public class TestPriceBufferGlobal$$ {
                                                                 //if (h01==10) ht=23;
                                                                 //configs.get(h).setEnabled(true);
 
-                                                                configs.get(ht).setThr(thr);
+                                                                //configs.get(ht).setThr(thr);
                                                                 //configs.get(ht).setTp(tp);
                                                                 //configs.get(ht).setSl(sl);
                                                                 //configs.get(ht).setMaxBars(maxBars);
@@ -2338,7 +2365,7 @@ public class TestPriceBufferGlobal$$ {
                                                                                     for (int dayWeek1 = Calendar.MONDAY + 0; dayWeek1 <= Calendar.MONDAY + 0; dayWeek1++) {
                                                                                         int dayWeek2 = dayWeek1 + 4;
                                                                                         String header = maxTrades + " " + PrintUtils.Print2dec(risk, false) + " || " + configs.get(h).toString();
-                                                                                        int year2016 = 2021;
+                                                                                        int year2016 = 2019;
                                                                                         int totalPositives = 0;
                                                                                         int total2016b = 0;
                                                                                         int total2016 = 0;
@@ -2362,6 +2389,8 @@ public class TestPriceBufferGlobal$$ {
                                                                                         tradess.clear();
                                                                                         profitPerArr.clear();
                                                                                         profitPer16Arr.clear();
+                                                                                        totalTradesArr.clear();
+                                                                                        srH.clear();
                                                                                         boolean lastTry = false;
                                                                                         for (int periods = 0; periods <= 10000; periods += 1) {
                                                                                             calFrom.set(yearStart, 00, 01);
@@ -2374,7 +2403,6 @@ public class TestPriceBufferGlobal$$ {
                                                                                                 calFrom.add(Calendar.DAY_OF_YEAR, periods * periodMult);
                                                                                                 calTo.setTimeInMillis(calFrom.getTimeInMillis());
                                                                                                 calTo.add(Calendar.DAY_OF_YEAR, periodLen);
-                                                                                                //calTo.add(Calendar.DAY_OF_MONTH, -1);
                                                                                             }
 
                                                                                             int toYear = calTo.get(Calendar.YEAR);
@@ -2401,8 +2429,7 @@ public class TestPriceBufferGlobal$$ {
                                                                                                     + ' ' + maxBars + ' ' + barsBack + " " + maxH + " " + lostPips;
                                                                                             String csvFileName = path0 + "tbglobal_" + thr + "_" + tp + "_" + sl
                                                                                                     + "_" + String.valueOf((int) (risk * 10)) + ".csv";
-                                                                                            //csvFileName =path0+"tb_global_prod_20200805_darwinexRisk.csv";
-                                                                                            csvFileName = path0 + "tb_global_prod_20211126_axiRisk.csv";
+                                                                                            csvFileName = path0 + "strategies\\" + "tb_global_prod_20231003_global.csv";
                                                                                             //csvFileName = "";
                                                                                             sp.reset();
                                                                                             sp.setActualBalance(balance);
@@ -2418,6 +2445,7 @@ public class TestPriceBufferGlobal$$ {
                                                                                                     maxDiff,
                                                                                                     sma,
                                                                                                     thrSma,
+                                                                                                    minAcceptableDiffFromPeak,
                                                                                                     false,//debug
                                                                                                     printSummary, 0, dayTotalPips,
                                                                                                     true, true, printdayprofit, csvFileName,
@@ -2429,6 +2457,9 @@ public class TestPriceBufferGlobal$$ {
                                                                                                 double m10 = sp.getMonthVar(maxVar);
                                                                                                 double pfNoSL = sp.getWinPipsNoSLTP() * 1.0 / sp.getLostPipsNoSLTP();
                                                                                                 pfNoSLArr.add(pfNoSL);
+
+                                                                                                srH.add(sp.getSharpeRatio());
+                                                                                                totalTradesArr.add(sp.getTrades());
                                                                                                 //maxTradesArr.add(sp.getMaxTradesDays());
                                                                                                 if (pf >= 3.0)
                                                                                                     pf = 3.0;//no tiene sentido agregar grandes
@@ -2459,16 +2490,22 @@ public class TestPriceBufferGlobal$$ {
                                                                                                 if (pf >= 1.00)
                                                                                                     totalPositivePeriods++;
                                                                                             }
-
-                                                                                            //if (calTo.getTimeInMillis()>calMax.getTimeInMillis()) break;
                                                                                         }//periods
 
                                                                                         if (isTrialsMode) {
                                                                                             double avgsrh = MathUtils.average(srH);
-																						/*System.out.println(totalPeriods+" "+totalPositivePeriods+" "+srH.size()
-																								+" || "+PrintUtils.Print3dec(totalPositivePeriods*100.0/totalPeriods,false)
-																								+" || "+PrintUtils.Print3dec(avgsrh,false)
-																						);*/
+                                                                                            double dt = Math.sqrt(MathUtils.varianceD(srH));
+                                                                                            double avgTades = MathUtils.average(totalTradesArr);
+                                                                                            System.out.println(
+                                                                                                    thr + " " + tp + " " + sl + " " + maxBars + " " + barsBack
+                                                                                                            + " || " + totalPeriods + " " + totalPositivePeriods + " " + srH.size()
+                                                                                                            + " || " + PrintUtils.Print3dec(totalPositivePeriods * 100.0 / totalPeriods, false)
+                                                                                                            + " " + PrintUtils.Print3dec(total2016Positives * 100.0 / total2016, false)
+                                                                                                            + " || " + PrintUtils.Print3dec(avgsrh, false)
+                                                                                                            + " " + PrintUtils.Print3dec(dt, false)
+                                                                                                            + " " + PrintUtils.Print3dec(avgsrh / dt, false)
+                                                                                                            + " " + PrintUtils.Print2dec(avgTades, false)
+                                                                                            );
                                                                                         }
 
                                                                                         double positivePer = totalPositives * 100.0 / total2016b;
@@ -2517,7 +2554,7 @@ public class TestPriceBufferGlobal$$ {
                                                                                         }
 
 
-                                                                                        if (!isTrialsMode)
+                                                                                        /*if (!isTrialsMode)
                                                                                             System.out.println(
                                                                                                     maxTrades + " " + PrintUtils.Print3dec(maxVar, false)
                                                                                                             + " " + maxDiff
@@ -2539,7 +2576,7 @@ public class TestPriceBufferGlobal$$ {
                                                                                                             + " || avg2016%= " + PrintUtils.Print3dec(avg16Profit, false) + " " + PrintUtils.Print3dec(dt16Profit, false)
                                                                                                             + " || " + PrintUtils.Print3dec(avgTrades, false) + " " + PrintUtils.Print3dec(avgTrades2016, false)
                                                                                                             + " || " + PrintUtils.Print3dec(avgMaxTrades, false)
-                                                                                            );
+                                                                                            );*/
                                                                                     }//dayweek
                                                                             }//comm
                                                                         }//maxDiff
