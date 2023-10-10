@@ -2307,7 +2307,7 @@ public class TestPriceBufferGlobal$$ {
                     calMax.set(yearEnd, 11, 31);
                 }
                 System.out.println("** TESTPRICEBUFFER YEAR START: " + yearStart + " " + yearEnd + " || n�strats= " + configs.size());
-                for (int h = -1; h <= -1; h++) {//-1 para testear todas
+                for (int h = 0; h <= 0; h++) {//-1 para testear todas
                     if (h >= 0) {
                         int ht = h;
                         if (ht == 10) ht = 23;
@@ -2326,9 +2326,9 @@ public class TestPriceBufferGlobal$$ {
                     int totalPosiTiveTrials = 0;
                     srH.clear();
                     for (int min = -1; min <= -1; min += 5)
-                        for (int thr = 162; thr <= 162; thr += 6) {
-                            for (int tp = 7; tp <= 7; tp += 1) {
-                                for (int sl = 55; sl <= 55; sl += 5) {
+                        for (int thr = 132; thr <= 132; thr += 12) {
+                            for (int tp = 5; tp <= 120; tp += 5) {
+                                for (int sl = 50; sl <= 50; sl += 5) {
                                     for (double risk = 0.1; risk <= 0.1; risk += 0.1) {
                                         for (int maxBars = 72; maxBars <= 72; maxBars += 6) {//35
                                             //totalTrials++;
@@ -2344,8 +2344,8 @@ public class TestPriceBufferGlobal$$ {
                                                                 //if (h01==10) ht=23;
                                                                 //configs.get(h).setEnabled(true);
 
-                                                                //configs.get(ht).setThr(thr);
-                                                                //configs.get(ht).setTp(tp);
+                                                                configs.get(ht).setThr(thr);
+                                                                configs.get(ht).setTp(tp);
                                                                 //configs.get(ht).setSl(sl);
                                                                 //configs.get(ht).setMaxBars(maxBars);
                                                                 //configs.get(ht).setBarsBack(barsBack);

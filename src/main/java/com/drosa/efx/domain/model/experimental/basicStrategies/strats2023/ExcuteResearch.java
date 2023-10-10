@@ -37,7 +37,7 @@ public class ExcuteResearch {
 
         AnalisisResultadosConjuntos2021 ana = new AnalisisResultadosConjuntos2021();
 
-        double balanceI = 2500;
+        double balanceI = 3500;
         ArrayList<String> darwinex1Files = new ArrayList<String>();
         ArrayList<String> darwinexFiles = new ArrayList<String>();
         ArrayList<String> axiFiles = new ArrayList<String>();
@@ -69,6 +69,7 @@ public class ExcuteResearch {
         int totalDays = 0;
         double accDayReturnAvg = 0;
         double accDayReturnDT = 0;
+        double leverageAlert = 15;
         ArrayList<Double> ddArray = new ArrayList<Double>();
         for (double balance = balanceI; balance <= balanceI - 0; balance += 1000) {
             //System.out.println("***balance= "+balance);
@@ -76,8 +77,8 @@ public class ExcuteResearch {
                 sp.reset();
                 sp.setInitialBalance(balance);
                 for (int minATR = 0; minATR <= 0; minATR += 1) {
-                    //isEndInt = doTestProductionSystem("DMO",path,darwinex1Files,balance,atrHash,offset,12,true,false,minATR,sp,0);
-                    isEndInt = doTestProductionSystem("DQO", path, darwinexFiles, balance, atrHash, offset, 12, true, false, minATR, sp, 0);
+                    isEndInt = doTestProductionSystem("DMO", path, darwinex1Files, balance, atrHash, offset, 12, true, false, minATR, leverageAlert, sp, 0);
+                    //isEndInt = doTestProductionSystem("DQO", path, darwinexFiles, balance, atrHash, offset, 12, true, false, minATR, leverageAlert, sp, 0);
                     //isEndInt = doTestProductionSystem("",path,axiFiles,balance,atrHash,offset,-1,true,false,minATR,sp);
                     //isEndInt = doTestProductionSystem("",path,axiFiles2,balance,atrHash,offset,3,true,false,minATR,sp,0);//exludesdAys
                     //isEndInt = doTestProductionSystem("",path,axiFiles2,balance,atrHash,offset,120,true,false,minATR,sp,1);//exludesdAys

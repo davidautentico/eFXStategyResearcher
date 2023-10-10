@@ -771,6 +771,24 @@ public class DateUtils {
             }
         }
 
+        if (calY == 2022) {
+            if ((calM > Calendar.MARCH && calM <= Calendar.OCTOBER)
+                    || (calM == Calendar.MARCH && calD >= 10)
+                    || (calM == Calendar.OCTOBER && calD < 31)
+            ) {
+                return GMT_MODE;
+            }
+        }
+
+        if (calY == 2023) {
+            if ((calM > Calendar.MARCH && calM <= Calendar.OCTOBER)
+                    || (calM == Calendar.MARCH && calD >= 12)
+                    || (calM == Calendar.OCTOBER && calD < 31)
+            ) {
+                return GMT_MODE;
+            }
+        }
+
         return offset;
     }
 

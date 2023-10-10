@@ -156,6 +156,7 @@ public class AnalisisResultadosConjuntos2021 {
                                                     int offset2,
                                                     boolean isAlways,
                                                     int minAtr,
+                                                    double leverageAlert,
                                                     StratPerformance sp
     ) throws IOException {
 
@@ -222,7 +223,7 @@ public class AnalisisResultadosConjuntos2021 {
                     currHash.put(cali.getTimeInMillis(), lines.get(j).split(";")[1].trim());
                     leveHash.put(cali.getTimeInMillis(), leve);
                 } catch (Exception e) {
-                    System.out.println("ERROR: " + fileName + " " + lines.get(j) + " " + e.getMessage());
+                    System.out.println("ERROR: " + fileName + " | " + lines.get(j) + " | " + e.getMessage());
                 }
             }
             valuesArray.add(currHash);
@@ -446,7 +447,7 @@ public class AnalisisResultadosConjuntos2021 {
             double actualLeverage = totalLeve;
             if (actualLeverage >= maxDayLeverage) maxDayLeverage = actualLeverage;
             //if (actualLeverage>=9.75){
-            if (actualLeverage >= 9.75) {
+            if (actualLeverage >= leverageAlert) {
                 int daykey = year * 365 + cal.get(Calendar.DAY_OF_YEAR);
 
                 if (!dayLeverage.containsKey(daykey)) {
@@ -692,6 +693,7 @@ public class AnalisisResultadosConjuntos2021 {
                                              HashMap<Integer, Integer> atrHash,
                                              int offset, int offset2, boolean isAlways, boolean printComponents,
                                              int minATR,
+                                             double leverageAlert,
                                              StratPerformance sp,
                                              int excludeFomcDays
     ) throws IOException {
@@ -708,7 +710,8 @@ public class AnalisisResultadosConjuntos2021 {
             getExcludeDays(path + "FOMC.csv", excludedDays, excludeFomcDays);//excluir dia de antes dia y dia despues
 
         //el resultado mas exacto sale de los bollinger
-        int isEndInt = doCalculateResultadoAgregado("SPC", balance, atrHash, excludedDays, files, offset, offset2, isAlways, minATR, sp);
+        int isEndInt = doCalculateResultadoAgregado("SPC", balance, atrHash, excludedDays, files, offset, offset2,
+                isAlways, minATR, leverageAlert, sp);
 
         if (printComponents) {
             ArrayList<String> test = new ArrayList<String>();
@@ -716,7 +719,8 @@ public class AnalisisResultadosConjuntos2021 {
                 test.clear();
                 test.add(files.get(i));
                 balance = 7000;
-                doCalculateResultadoAgregado("SPI: " + files.get(i), balance, atrHash, excludedDays, test, offset, offset2, true, 0, sp);
+                doCalculateResultadoAgregado("SPI: " + files.get(i), balance, atrHash, excludedDays, test, offset,
+                        offset2, true, 0, leverageAlert, sp);
             }
         }
 
@@ -917,6 +921,7 @@ public class AnalisisResultadosConjuntos2021 {
         int totalDays = 0;
         double accDayReturnAvg = 0;
         double accDayReturnDT = 0;
+        double leverageAlert = 9.75;
         ArrayList<Double> ddArray = new ArrayList<Double>();
         for (double balance = balanceI; balance <= balanceI - 0; balance += 1000) {
             //System.out.println("***balance= "+balance);
@@ -925,7 +930,7 @@ public class AnalisisResultadosConjuntos2021 {
                 sp.setInitialBalance(balance);
                 for (int minATR = 0; minATR <= 0; minATR += 1) {
                     //isEndInt = doTestProductionSystem("DMO",path,darwinex1Files,balance,atrHash,offset,12,true,false,minATR,sp,0);
-                    isEndInt = doTestProductionSystem("DQO", path, darwinexFiles, balance, atrHash, offset, 3, true, false, minATR, sp, 0);
+                    isEndInt = doTestProductionSystem("DQO", path, darwinexFiles, balance, atrHash, offset, 3, true, false, minATR, leverageAlert, sp, 0);
                     //isEndInt = doTestProductionSystem("",path,axiFiles,balance,atrHash,offset,-1,true,false,minATR,sp);
                     //isEndInt = doTestProductionSystem("",path,axiFiles2,balance,atrHash,offset,3,true,false,minATR,sp,0);//exludesdAys
                     //isEndInt = doTestProductionSystem("",path,axiFiles2,balance,atrHash,offset,120,true,false,minATR,sp,1);//exludesdAys
