@@ -11,6 +11,7 @@ import com.drosa.efx.domain.utils.PrintUtils;
 import com.drosa.efx.domain.utils.TradingUtils;
 import com.drosa.efx.infrastructure.DAO;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,8 +30,8 @@ public class ExcuteResearch {
      */
     public static void main(String[] args) throws IOException {
 
-        String path = "data\\";
-        String stratsFile = path + "strategies\\" + AnalisisResultadosConjuntos2021.ESTRATEGIAS;
+        String path = "data" + File.separator;
+        String stratsFile = path + "strategies" + File.separator + AnalisisResultadosConjuntos2021.ESTRATEGIAS;
         String eurBidFile = path + AnalisisResultadosConjuntos2021.EURUSD_5MIN_BID;
         int rec_year1 = 2012;
         int rec_year2 = 2023;

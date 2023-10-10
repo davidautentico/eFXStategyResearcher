@@ -2149,7 +2149,7 @@ public class TestPriceBufferGlobal$$ {
 
         //Path resourceDirectory = Paths.get("data");
         //String path0 = resourceDirectory.toFile().getAbsolutePath() + "\\";
-        String path0 = "data\\";
+        String path0 = "data" + File.separator;
         Path pathP = Paths.get(path0);
         if (!Files.exists(pathP)) {
             path0 = "c:\\fxdata\\";
@@ -2252,16 +2252,16 @@ public class TestPriceBufferGlobal$$ {
 
                 //NUEVAS CONFIGS PARA 2021
                 StrategyConfig config = new StrategyConfig();
-                config.setParams(0, 0, 192, 50, 60, 144, 4, 2, true);//r
+                config.setParams(0, 0, 132, 75, 85, 144, 4, 2, true);//r
                 configs.add(config);//12
                 StrategyConfig config1 = new StrategyConfig();
-                config1.setParams(1, 1, 156, 65, 85, 180, 10, 2, true);//r
+                config1.setParams(1, 1, 168, 70, 90, 186, 11, 1, true);//r
                 configs.add(config1);//12
                 StrategyConfig config2 = new StrategyConfig();
-                config2.setParams(2, 2, 312, 10, 90, 132, 6, 7, true);//r
+                config2.setParams(2, 2, 492, 10, 80, 156, 5, 6, true);//r
                 configs.add(config2);//6
                 StrategyConfig config3 = new StrategyConfig();
-                config3.setParams(3, 3, 168, 20, 60, 90, 2, 4, true);//r
+                config3.setParams(3, 3, 480, 15, 60, 102, 2, 4, true);//r
                 configs.add(config3);
                 StrategyConfig config4 = new StrategyConfig();
                 config4.setParams(4, 4, 444, 16, 60, 78, 12, 3, true);//r
@@ -2282,7 +2282,7 @@ public class TestPriceBufferGlobal$$ {
                 config9.setParams(9, 9, 600, 20, 40, 18, 2, 1, false);//r no investible
                 configs.add(config9);
                 StrategyConfig config23 = new StrategyConfig();
-                config23.setParams(23, 23, 162, 7, 55, 72, 4, 4, true);
+                config23.setParams(23, 23, 588, 7, 70, 72, 4, 4, true);
                 configs.add(config23);
 
                 HashMap<Integer, Integer> dayTotalPips = new HashMap<Integer, Integer>();
@@ -2307,7 +2307,7 @@ public class TestPriceBufferGlobal$$ {
                     calMax.set(yearEnd, 11, 31);
                 }
                 System.out.println("** TESTPRICEBUFFER YEAR START: " + yearStart + " " + yearEnd + " || n�strats= " + configs.size());
-                for (int h = 0; h <= 0; h++) {//-1 para testear todas
+                for (int h = -1; h <= -1; h++) {//-1 para testear todas
                     if (h >= 0) {
                         int ht = h;
                         if (ht == 10) ht = 23;
@@ -2326,14 +2326,14 @@ public class TestPriceBufferGlobal$$ {
                     int totalPosiTiveTrials = 0;
                     srH.clear();
                     for (int min = -1; min <= -1; min += 5)
-                        for (int thr = 132; thr <= 132; thr += 12) {
-                            for (int tp = 5; tp <= 120; tp += 5) {
-                                for (int sl = 50; sl <= 50; sl += 5) {
+                        for (int thr = 168; thr <= 168; thr += 12) {
+                            for (int tp = 70; tp <= 70; tp += 1) {
+                                for (int sl = 90; sl <= 90; sl += 5) {
                                     for (double risk = 0.1; risk <= 0.1; risk += 0.1) {
-                                        for (int maxBars = 72; maxBars <= 72; maxBars += 6) {//35
+                                        for (int maxBars = 186; maxBars <= 186; maxBars += 6) {//35
                                             //totalTrials++;
                                             //System.out.println("*****test..."+totalTrials);
-                                            for (int barsBack = 4; barsBack <= 4; barsBack++) {
+                                            for (int barsBack = 11; barsBack <= 11; barsBack++) {
                                                 for (int maxH = 0; maxH <= 0; maxH += 1) {
                                                     for (int lostPips = 8000; lostPips <= 8000; lostPips += 50) {
                                                         if (configs.get(h) != null) {
@@ -2344,8 +2344,8 @@ public class TestPriceBufferGlobal$$ {
                                                                 //if (h01==10) ht=23;
                                                                 //configs.get(h).setEnabled(true);
 
-                                                                configs.get(ht).setThr(thr);
-                                                                configs.get(ht).setTp(tp);
+                                                                //configs.get(ht).setThr(thr);
+                                                                //configs.get(ht).setTp(tp);
                                                                 //configs.get(ht).setSl(sl);
                                                                 //configs.get(ht).setMaxBars(maxBars);
                                                                 //configs.get(ht).setBarsBack(barsBack);
@@ -2429,7 +2429,7 @@ public class TestPriceBufferGlobal$$ {
                                                                                                     + ' ' + maxBars + ' ' + barsBack + " " + maxH + " " + lostPips;
                                                                                             String csvFileName = path0 + "tbglobal_" + thr + "_" + tp + "_" + sl
                                                                                                     + "_" + String.valueOf((int) (risk * 10)) + ".csv";
-                                                                                            csvFileName = path0 + "strategies\\" + "tb_global_prod_20231003_global.csv";
+                                                                                            csvFileName = path0 + "strategies" + File.separator + "tb_global_prod_20231003_global.csv";
                                                                                             //csvFileName = "";
                                                                                             sp.reset();
                                                                                             sp.setActualBalance(balance);
